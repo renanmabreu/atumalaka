@@ -1,0 +1,85 @@
+Implemente um catálogo local de consulta dos placards da configuração CD.
+Use consulta-placards-cd.html, se presente, como protótipo. Não se limite a
+descrever a solução: implemente, execute os testes e documente o uso.
+
+OBJETIVO
+O usuário precisa localizar a aplicação de um placard a partir do PN novo
+ou do CDPL antigo. Cada resultado deve mostrar a descrição cadastrada, o
+topo (desenho), posição, zona, folhas onde o placard aparece e a quantidade
+em cada folha. O Excel é a fonte de referência. A consulta não substitui
+o desenho liberado e não pode modificar a planilha.
+
+FONTE E ESCOPO
+- Aceite PLANILHA_PLACARD CD.xlsx por parâmetro. Suporte o legado.xls com
+  leitor apropriado, ou documente a conversão para.xlsx. Não execute macros.
+- Leia todas as linhas das abas PLACARD, KIT PLASTIC e PLACARD, KIT METALLIC.
+- Use somente registros com configuração CD em H. Não misture LX, AL,
+  placas de saída, Controle de Folhas ou abas auxiliares. Registre exclusões.
+- No recorte conferido, o plástico usa o topo 171-60473-401/ CD e o
+  metálico usa 171-60474-401/ CD. Não fixe as contagens no importador.
+
+MAPEAMENTO
+A PN novo; B referência E2; C PN antigo/CDPL; D POS; E ZONE;
+F QTY prevista; G FORMATO/descrição original; H topo do desenho;
+I ECODE; J ACTION; K LIBERADO; L:AE SH1:SH20; AF Total registrado;
+AG Check de quantidade; AH observações.
+No plástico, C tem o cabeçalho CDPL (REF) e H tem CONJUNTO.
+No metálico, C é o segundo PART NUMBER e H tem MATERIAL. Valide o layout
+por posição e cabeçalho; não mapeie o metálico apenas pelo nome da coluna.
+
+REGRAS DOS DADOS
+- Cada registro representa uma linha da fonte; preserve aba e linha para
+  rastreabilidade. Não deduplique por PN ou CDPL. Se A estiver vazia, mantenha
+  a linha quando C estiver preenchida. Não herde PN, nome ou status da linha anterior.
+- Trate identificadores como texto. Preserve zeros à esquerda de POS usando
+  o valor formatado quando necessário. Não invente nomes ou traduções.
+  Diferencie célula vazia de zero. Sinalize CDPLXXX-XX como referência provisória.
+- SHn informa a quantidade na folha n, não o andamento. Mostre todas as
+  folhas preenchidas. Não invente zona por folha se a fonte só traz a zona da linha.
+- Exiba QTY, soma das folhas e Total registrado separadamente. Avise sobre
+  divergências sem corrigir a fonte. Check de quantidade não significa liberação.
+
+INTERFACE E ENTREGA
+- Gere um HTML autônomo, com a base completa incorporada a partir do arquivo
+  fornecido, sem CDN, telemetria ou chamadas de rede para pesquisar.
+  Mantenha importação CSV/TSV como alternativa. Sem arquivo real, rotule a
+  base como não carregada; use dados sintéticos apenas em testes.
+- Busca por PN novo, CDPL, referência E2, descrição e topo. Priorize
+  correspondências exatas de PN/CDPL. Aceite caixa, espaços e hífens
+  diferentes na busca, sem mudar os códigos exibidos.
+- Combine filtros por kit, topo e folha. Filtrar por uma folha não deve
+  esconder as demais folhas na ficha. Exiba contagem, estado sem resultados,
+  campos não informados, origem e avisos. Use controles acessíveis por teclado.
+- Entregue importador reproduzível, HTML, testes e README com instruções para
+  atualizar a base e operar a consulta. Não publique dados reais por padrão.
+
+DESENHOS 2D
+- Crie um manifesto versionado com configuração, topo normalizado, revisão,
+  origem do PDF e mapa explícito {folha: página do PDF}, com base 1.
+- Aceite seleção local de PDF ou URL HTTPS corporativa explicitamente
+  autorizada. Nunca carregue automaticamente links. Não use lista de peças
+  como substituto do desenho 2D. Não deduza folha=página; capas e índices
+  podem deslocar a numeração. Permita escolher qual revisão está ativa.
+- Por aplicação, abra o PDF na página mapeada quando possível. Disponibilize
+  também o documento inteiro com orientação para navegar manualmente.
+  Distinga PDF não associado, PDF local que precisa ser selecionado novamente
+  e folha sem página mapeada.
+- Permita exportar/importar os metadados do mapa sem incluir o PDF. Valide
+  topo, configuração, revisão, duplicatas e páginas inválidas. Trate dados
+  do Excel e do manifesto como texto, nunca como HTML executável.
+  Mantenha os desenhos e a base em armazenamento autorizado.
+
+CRITÉRIOS DE ACEITAÇÃO
+1. O snapshot conferido tem 189 registros plásticos e 72 metálicos, dos quais
+   60 metálicos estão sem PN novo. Compare com a fonte efetivamente fornecida;
+   reporte diferenças em vez de alterar a importação para forçar esses números.
+2. 171-50557-021 ou CDPL569-1-16 encontra POS 00122, zona F204, topo
+   171-60473-401/ CD e folha 20 com 1 unidade. Busque também sem hífens.
+3. 171-60555-001 encontra o topo metálico e as folhas 6, 7, 9 e 11 com
+   1 unidade cada. CDPL568-201 continua pesquisável sem PN novo e sem descrição.
+4. A linha 130 do plástico preserva a divergência entre QTY, distribuição e
+   Total registrado; nenhuma célula da fonte é alterada.
+5. Teste filtros combinados, valores ausentes, zeros à esquerda, aspas,
+   acentos e dados não CD. Teste com PDF sintético o caso folha 20 → página 22,
+   revisão ativa, mapa ausente e abertura do documento inteiro. Só declare
+   validados os vínculos oficiais depois de conferir os PDFs liberados.
